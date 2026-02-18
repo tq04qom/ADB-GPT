@@ -1,6 +1,8 @@
 # mumu_adb_controller/common/pathutil.py
 import os, sys
+from functools import lru_cache
 
+@lru_cache(maxsize=1)
 def app_base_dir() -> str:
     """
     冻结安全：开发态返回 main.py 所在目录；PyInstaller 打包后返回 _MEIPASS。

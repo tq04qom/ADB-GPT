@@ -1,22 +1,11 @@
 # mumu_adb_controller/ui/tasks/auto_like.py
-import os
-import sys
 import time
 import random
 from typing import Tuple
 
 from ..helpers import matcher
-
-# 冻结安全的资源定位
-try:
-    from ...common.pathutil import res_path
-except Exception:
-    def _app_base_dir():
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            return sys._MEIPASS
-        return os.path.dirname(os.path.abspath(sys.argv[0]))
-    def res_path(*parts: str):
-        return os.path.join(_app_base_dir(), *parts)
+from ..helpers.sleep_utils import friendly_sleep
+from ...common.pathutil import res_path
 
 THRESH = matcher.THRESH
 
@@ -30,14 +19,7 @@ def _sleep(app, sec: float):
             factor = float(getattr(app, "speed_factor", 1.0))
         except Exception:
             factor = 1.0
-    end = time.time() + max(0.0, sec * factor)
-    pause_ev = getattr(app, "pause_event", None)
-    while time.time() < end:
-        while pause_ev is not None and pause_ev.is_set():
-            time.sleep(0.05)
-        remaining = end - time.time()
-        if remaining > 0:
-            time.sleep(min(0.1, remaining))
+    friendly_sleep(app, sec * factor)
 
 
 def _paths():
