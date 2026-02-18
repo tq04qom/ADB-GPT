@@ -482,12 +482,12 @@ class DeviceTabQt(QWidget):
         else:
             self._btn_sweep_city()
 
-    def _task_context(self, tab: "DeviceTabQt", should_stop, *, threshold=None, verbose=False) -> TaskContext:
+    def _task_context(self, target_tab: "DeviceTabQt", should_stop, *, threshold=None, verbose=False) -> TaskContext:
         return TaskContext(
             app=self.app,
-            serial=tab.serial,
-            toast=tab._toast,
-            log=tab.device_log,
+            serial=target_tab.serial,
+            toast=target_tab._toast,
+            log=target_tab.device_log,
             should_stop=should_stop,
             threshold=threshold,
             verbose=verbose,
