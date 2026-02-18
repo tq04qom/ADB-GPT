@@ -1,0 +1,7 @@
+PySide6
+pillow
+opencv-python
+numpy
+pytesseract
+pyautogui
+pygetwindow
