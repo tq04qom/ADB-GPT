@@ -1,23 +1,12 @@
 # mumu_adb_controller/ui/tasks/init_to_wild.py
 import os
-import sys
 import time
 from ..helpers import matcher
+from ..helpers.sleep_utils import friendly_sleep
+from ...common.pathutil import res_path
 
 THRESH = matcher.THRESH
 MAX_LOOPS = 5
-
-# ---------- 冻结安全的资源定位 ----------
-try:
-    from ...common.pathutil import res_path
-except Exception:
-    # 兜底：即使 pathutil 未就绪也能在开发与打包环境运行
-    def _app_base_dir():
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            return sys._MEIPASS
-        return os.path.dirname(os.path.abspath(sys.argv[0]))
-    def res_path(*parts: str):
-        return os.path.join(_app_base_dir(), *parts)
 
 def _logv(log, msg: str, verbose: bool):
     if verbose:
@@ -69,15 +58,7 @@ def run_init_to_wild(app, serial: str, toast, log,
     _logv(log, f"global speed=x{speed:.2f}, multi={is_multi}", verbose)
 
     def _sleep(sec: float):
-        end = time.time() + max(0.0, sec) * speed
-        pause_ev = getattr(app, "pause_event", None)
-        while time.time() < end:
-            # 全局暂停时阻塞
-            while pause_ev is not None and pause_ev.is_set():
-                time.sleep(0.05)
-            remaining = end - time.time()
-            if remaining > 0:
-                time.sleep(min(0.1, remaining))
+        friendly_sleep(app, sec * speed)
 
     def screencap() -> bytes | None:
         ok, data = app.adb.screencap(serial)

@@ -33,7 +33,11 @@ class DeviceWorker:
             try:
                 self.idle = False
                 fn()
+            except KeyboardInterrupt:
+                self.logger.warning(f"[{self.serial}] 任务中断：KeyboardInterrupt")
+            except TimeoutError as e:
+                self.logger.error(f"[{self.serial}] 任务超时：{e}")
             except Exception as e:
-                self.logger.error(f"[{self.serial}] 任务错误：{e}")
+                self.logger.error(f"[{self.serial}] 任务错误({type(e).__name__})：{e}")
             finally:
                 self.idle = True

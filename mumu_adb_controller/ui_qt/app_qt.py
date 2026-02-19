@@ -149,21 +149,12 @@ class AppQt(QMainWindow):
 
         top.addStretch(1)
 
-        # 移动界面按钮
-        self.btn_mobile_view = QPushButton("📱 移动界面")
-        self.btn_mobile_view.clicked.connect(self.open_mobile_view)
-        self.btn_mobile_view.setToolTip("打开移动端风格界面")
-        top.addWidget(self.btn_mobile_view)
-
         # 置顶按钮移至最右侧
         self.btn_on_top = QPushButton("置顶")
         self.btn_on_top.setCheckable(True)
         self.btn_on_top.setChecked(bool(self.cfg.get("always_on_top", False)))
         self.btn_on_top.toggled.connect(self.toggle_always_on_top)
         top.addWidget(self.btn_on_top)
-
-        # 移动界面窗口引用
-        self.mobile_window = None
 
         # 全局暂停/停止事件
         self.pause_event = threading.Event()
@@ -1352,54 +1343,6 @@ class AppQt(QMainWindow):
                 print(f"⚠ 标签回贴后未找到: {serial}")
         except Exception as e:
             print(f"回贴标签异常 {serial}: {e}")
-            import traceback
-            traceback.print_exc()
-
-    # ---------------- 移动界面 ----------------
-    def open_mobile_view(self) -> None:
-        """打开移动端界面并关闭主界面"""
-        try:
-            # 如果已经打开，则激活窗口
-            if self.mobile_window is not None:
-                try:
-                    self.mobile_window.show()
-                    self.mobile_window.raise_()
-                    self.mobile_window.activateWindow()
-                    return
-                except Exception:
-                    self.mobile_window = None
-
-            # 导入移动界面（重构版，等比缩放+拖拽）
-            from .mobile_view_qt_new import MobileMainWindow
-
-            # 创建移动界面窗口
-            self.mobile_window = MobileMainWindow(self)
-
-            # 设置关闭事件处理
-            def on_mobile_closed():
-                """移动界面关闭时重新显示主界面"""
-                self.mobile_window = None
-                self.show()
-                self.raise_()
-                self.activateWindow()
-                self.logger.info("移动端界面已关闭，恢复主界面")
-
-            # 重写移动窗口的closeEvent
-            original_close = self.mobile_window.closeEvent
-            def new_close_event(event):
-                original_close(event)
-                on_mobile_closed()
-            self.mobile_window.closeEvent = new_close_event
-
-            # 显示移动界面
-            self.mobile_window.show()
-
-            # 隐藏主界面
-            self.hide()
-
-            self.logger.info("已切换到移动端界面")
-        except Exception as e:
-            self.logger.error(f"打开移动界面失败: {e}")
             import traceback
             traceback.print_exc()
 

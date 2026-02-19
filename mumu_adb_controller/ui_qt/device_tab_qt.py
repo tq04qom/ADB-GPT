@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..common.logger import Logger
+from ..common.task_context import TaskContext
 from ..common.worker import DeviceWorker
 from ..core.adb import AdbClient
 
@@ -481,6 +482,17 @@ class DeviceTabQt(QWidget):
         else:
             self._btn_sweep_city()
 
+    def _task_context(self, target_tab: "DeviceTabQt", should_stop, *, threshold=None, verbose=False) -> TaskContext:
+        return TaskContext(
+            app=self.app,
+            serial=target_tab.serial,
+            toast=target_tab._toast,
+            log=target_tab.device_log,
+            should_stop=should_stop,
+            threshold=threshold,
+            verbose=verbose,
+        )
+
     def _btn_sweep_army(self):
         try:
             secs = int(self.sweep_seconds.text().strip() or "9")
@@ -506,15 +518,16 @@ class DeviceTabQt(QWidget):
 
         def make_runner(tab: "DeviceTabQt"):
             def runner(should_stop):
+                ctx = self._task_context(tab, should_stop, threshold=None, verbose=False)
                 run_sweep_army(
-                    self.app, tab.serial, secs,
-                    toast=tab._toast, log=tab.device_log,
+                    ctx.app, ctx.serial, secs,
+                    toast=ctx.toast, log=ctx.log,
                     loop_count=loops,
                     total_duration=0,
-                    should_stop=should_stop,
+                    should_stop=ctx.should_stop,
                     step_delay=step_delay,
-                    threshold=None,
-                    verbose=False,
+                    threshold=ctx.threshold,
+                    verbose=ctx.verbose,
                     stop_time=stop_time,
                     heal_count=heal_count,
                 )
@@ -576,8 +589,9 @@ class DeviceTabQt(QWidget):
 
         def make_runner(tab: "DeviceTabQt"):
             def runner(should_stop):
+                ctx = self._task_context(tab, should_stop, threshold=None, verbose=False)
                 run_sweep_city(
-                    self.app, tab.serial,
+                    ctx.app, ctx.serial,
                     target=target,
                     queue_mode=queue_mode,
                     heal_seconds=heal_seconds,
@@ -585,11 +599,11 @@ class DeviceTabQt(QWidget):
                     loop_interval=loop_interval,
                     soldier_x=soldier_x,
                     soldier_y=soldier_y,
-                    toast=tab._toast,
-                    log=tab.device_log,
-                    should_stop=should_stop,
-                    threshold=None,
-                    verbose=False,
+                    toast=ctx.toast,
+                    log=ctx.log,
+                    should_stop=ctx.should_stop,
+                    threshold=ctx.threshold,
+                    verbose=ctx.verbose,
                 )
             return runner
 
@@ -604,12 +618,13 @@ class DeviceTabQt(QWidget):
         mode = "joy" if raw in ("乔伊", "joy") else "harvest"
         def make_runner(tab: "DeviceTabQt"):
             def runner(should_stop):
+                ctx = self._task_context(tab, should_stop, threshold=None, verbose=False)
                 run_auto_garrison(
-                    self.app, tab.serial, mode,
-                    toast=tab._toast, log=tab.device_log,
-                    should_stop=should_stop,
-                    threshold=None,
-                    verbose=False,
+                    ctx.app, ctx.serial, mode,
+                    toast=ctx.toast, log=ctx.log,
+                    should_stop=ctx.should_stop,
+                    threshold=ctx.threshold,
+                    verbose=ctx.verbose,
                 )
             return runner
         if bool(self.app.cfg.get("global_mode", False)):
@@ -622,12 +637,13 @@ class DeviceTabQt(QWidget):
         def make_runner(tab: "DeviceTabQt"):
 
             def runner(should_stop):
+                ctx = self._task_context(tab, should_stop, threshold=None, verbose=False)
                 run_emergency_heal(
-                    self.app, tab.serial,
-                    toast=tab._toast, log=tab.device_log,
-                    should_stop=should_stop,
-                    threshold=None,
-                    verbose=False,
+                    ctx.app, ctx.serial,
+                    toast=ctx.toast, log=ctx.log,
+                    should_stop=ctx.should_stop,
+                    threshold=ctx.threshold,
+                    verbose=ctx.verbose,
                 )
             return runner
         if bool(self.app.cfg.get("global_mode", False)):
@@ -645,10 +661,11 @@ class DeviceTabQt(QWidget):
 
         def make_runner(tab: "DeviceTabQt"):
             def runner(should_stop):
+                ctx = self._task_context(tab, should_stop)
                 run_init_heal(
-                    self.app, tab.serial, heal_count,
-                    toast=tab._toast, log=tab.device_log,
-                    should_stop=should_stop,
+                    ctx.app, ctx.serial, heal_count,
+                    toast=ctx.toast, log=ctx.log,
+                    should_stop=ctx.should_stop,
                 )
             return runner
 
@@ -658,12 +675,13 @@ class DeviceTabQt(QWidget):
         from ..ui.tasks.ranshuang_mode import run_ranshuang_mode
         def make_runner(tab: "DeviceTabQt"):
             def runner(should_stop):
+                ctx = self._task_context(tab, should_stop, threshold=None, verbose=False)
                 run_ranshuang_mode(
-                    self.app, tab.serial,
-                    toast=tab._toast, log=tab.device_log,
-                    should_stop=should_stop,
-                    threshold=None,
-                    verbose=False,
+                    ctx.app, ctx.serial,
+                    toast=ctx.toast, log=ctx.log,
+                    should_stop=ctx.should_stop,
+                    threshold=ctx.threshold,
+                    verbose=ctx.verbose,
                 )
             return runner
         if bool(self.app.cfg.get("global_mode", False)):

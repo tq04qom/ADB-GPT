@@ -1,20 +1,9 @@
 # mumu_adb_controller/ui/tasks/sweep_army.py
-import os
-import sys
 import time
 from ..helpers import matcher
+from ..helpers.sleep_utils import friendly_sleep
 from .init_to_wild import run_init_to_wild
-
-# ---------- 冻结安全的资源定位 ----------
-try:
-    from ...common.pathutil import res_path
-except Exception:
-    def _app_base_dir():
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            return sys._MEIPASS
-        return os.path.dirname(os.path.abspath(sys.argv[0]))
-    def res_path(*parts: str):
-        return os.path.join(_app_base_dir(), *parts)
+from ...common.pathutil import res_path
 
 def _logv(log, msg: str, verbose: bool):
     if verbose:
@@ -62,14 +51,7 @@ def _screencap(app, serial, retry=3):
     return None
 
 def _sleep_pause(app, sec: float):
-    end = time.time() + max(0.0, float(sec))
-    pause_ev = getattr(app, "pause_event", None)
-    while time.time() < end:
-        while pause_ev is not None and pause_ev.is_set():
-            time.sleep(0.05)
-        remaining = end - time.time()
-        if remaining > 0:
-            time.sleep(min(0.1, remaining))
+    friendly_sleep(app, sec)
 
 def _delay_step(app, step_delay: float):
     _sleep_pause(app, step_delay)
