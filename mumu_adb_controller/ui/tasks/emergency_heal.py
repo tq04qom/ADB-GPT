@@ -1,4 +1,4 @@
-﻿import time
+import time
 from typing import Sequence
 
 from ..helpers import matcher

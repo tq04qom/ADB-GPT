@@ -1,4 +1,4 @@
-﻿import time
+import time
 import random
 from typing import Tuple
 
