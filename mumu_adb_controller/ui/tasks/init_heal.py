@@ -2,21 +2,11 @@
 初始化治疗功能 - 为刷全军做准备
 """
 import os
-import sys
 import time
 from ..helpers import matcher
 from . import init_to_wild
 
-# ---------- 冻结安全的资源定位 ----------
-try:
-    from ...common.pathutil import res_path
-except Exception:
-    def _app_base_dir():
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            return sys._MEIPASS
-        return os.path.dirname(os.path.abspath(sys.argv[0]))
-    def res_path(*parts: str):
-        return os.path.join(_app_base_dir(), *parts)
+from ...common.pathutil import res_path
 
 # 坐标定义
 COORD_WILD_ENTER = (640, 360)  # 进入野外的坐标
@@ -284,4 +274,3 @@ def run_init_heal(app, serial: str, heal_count: int, toast, log, should_stop=Non
 
     log("[INIT] ⚠️  初始化治疗被中断")
     return False
-

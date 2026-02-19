@@ -1,6 +1,49 @@
 # 项目历史与架构说明（HISTORY.md）
-当前版本：v1.16.3.9
+当前版本：v1.16.3.10
 
+
+## v1.16.3.10（2026-02-19）
+
+本次版本目标：继续推进 Phase-A 低风险重构，并在历史中沉淀“做法”
+
+### 做法（逐条推进）
+
+1. **扩展统一资源路径能力（不改功能）**
+   - 将更多任务文件从“本地 try/except fallback”切换为统一 `common.pathutil.res_path`
+   - 减少重复路径定位代码，统一行为来源
+
+2. **扩展统一等待能力（不改功能）**
+   - 在新增任务中继续复用 `helpers/sleep_utils.py` 的 `friendly_sleep`
+   - 保持原有速度因子逻辑，仅把暂停等待实现统一
+
+3. **保持渐进式改造策略**
+   - 仅改动可验证、低风险入口，不触碰业务流程顺序与参数默认值
+   - 每次改动后做定向语法与最小运行验证
+
+### 本次修改文件
+
+- `mumu_adb_controller/ui/tasks/auto_garrison.py`
+  - 移除本地资源路径 fallback，改为统一 `res_path`
+  - `_sleep` 改为调用 `friendly_sleep`（保留速度因子）
+- `mumu_adb_controller/ui/tasks/emergency_heal.py`
+  - 移除本地资源路径 fallback，改为统一 `res_path`
+- `mumu_adb_controller/ui/tasks/init_heal.py`
+  - 移除本地资源路径 fallback，改为统一 `res_path`
+- `mumu_adb_controller/ui/tasks/init_to_wild.py`
+  - 移除本地资源路径 fallback，改为统一 `res_path`
+  - 内部 `_sleep` 改为调用 `friendly_sleep`（保留速度因子）
+
+### 验证结果
+
+- ✅ `py_compile` 定向语法检查通过：
+  - `auto_garrison.py`
+  - `emergency_heal.py`
+  - `init_heal.py`
+  - `init_to_wild.py`
+- ✅ 最小运行验证通过（导入与函数级 smoke）
+- ✅ UI 截图验证已完成（本轮无新增 UI 控件变化）
+
+---
 
 ## v1.16.3.9（2025-11-08）
 

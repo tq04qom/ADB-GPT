@@ -1,20 +1,8 @@
-﻿import os
-import sys
-import time
+﻿import time
 from typing import Sequence
 
 from ..helpers import matcher
-
-try:
-    from ...common.pathutil import res_path
-except Exception:
-    def _app_base_dir():
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            return sys._MEIPASS
-        return os.path.dirname(os.path.abspath(sys.argv[0]))
-
-    def res_path(*parts: str):
-        return os.path.join(_app_base_dir(), *parts)
+from ...common.pathutil import res_path
 
 
 THRESH = matcher.THRESH
